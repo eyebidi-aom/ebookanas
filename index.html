@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5.0, user-scalable=yes">
+  <title>คลังความรู้</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: 'Kanit', sans-serif; font-size: 18px; color: #0f172a;
+      background: linear-gradient(160deg, #f0f7ff 0%, #dbeafe 40%, #eff6ff 100%);
+      min-height: 100vh;
+    }
+    button, input, textarea, select { font-family: inherit; }
+    [hidden] { display: none !important; }
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 16px; }
+    @media (min-width: 768px) { .wrap { padding: 32px; } }
+    .swal2-popup { font-family: 'Kanit', sans-serif !important; }
+
+    /* ── Header ── */
+    .header-card {
+      display: flex; align-items: center; gap: 18px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 55%, #3b82f6 100%);
+      border-radius: 24px; padding: 22px 28px; margin-bottom: 24px;
+      box-shadow: 0 8px 30px rgba(29,78,216,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+    .admin-icon {
+      width: 86px; height: 86px; flex-shrink: 0; border: none; cursor: pointer;
+      background: rgba(30,58,138,0.45); border-radius: 22px;
+      display: flex; align-items: center; justify-content: center; transition: background 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .admin-icon:hover { background: rgba(255,255,255,0.18); }
+    .admin-icon:focus-visible { outline: 3px solid #fde047; outline-offset: 3px; }
+    .book-icon-anim { display: inline-block; font-size: 48px; line-height: 1; color: #93c5fd; animation: book-bounce 3s ease-in-out infinite; }
+    @keyframes book-bounce { 0%,100% { transform: translateY(0) rotate(-5deg) scale(1); } 50% { transform: translateY(-10px) rotate(5deg) scale(1.05); } }
+    .hd-title { font-size: 42px; font-weight: 700; color: #fff; line-height: 1.15; }
+    .hd-sub { font-size: 21px; color: #dbeafe; margin-top: 4px; font-weight: 400; }
+    @media (max-width: 520px) {
+      .header-card { padding: 18px; gap: 14px; }
+      .admin-icon { width: 72px; height: 72px; }
+      .book-icon-anim { font-size: 40px; }
+      .hd-title { font-size: 34px; }
+      .hd-sub { font-size: 19px; }
+    }
+
+    /* ── แถบโหมดเจ้าหน้าที่ ── */
+    .admin-bar {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+      background: #fff7ed; border: 2px solid #fdba74; border-radius: 18px;
+      padding: 12px 16px; margin-bottom: 20px;
+    }
+    .admin-bar .ab-label { flex: 1 1 220px; color: #9a3412; font-weight: 500; font-size: 17px; }
+    .ab-btn { border: none; cursor: pointer; border-radius: 12px; padding: 10px 16px; font-size: 16px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; }
+    .ab-add { background: #1d4ed8; color: #fff; }
+    .ab-lock { background: #fff; color: #9a3412; border: 1.5px solid #fdba74; }
+
+    /* ── สถานะโหลด ── */
+    .state { text-align: center; padding: 70px 16px; font-size: 21px; color: #1e3a8a; }
+    .state .big { font-size: 52px; display: block; margin-bottom: 16px; }
+    .state-btn { margin-top: 18px; min-height: 60px; padding: 0 28px; border: none; border-radius: 16px; background: #1d4ed8; color: #fff; font-size: 21px; font-weight: 600; cursor: pointer; }
+
+    /* ── ตู้ไม้สักทอง ── */
+    .room {
+      background:
+        repeating-linear-gradient(173deg, transparent 0px, transparent 9px, rgba(100,55,10,0.07) 9px, rgba(100,55,10,0.07) 10px, transparent 10px, transparent 19px, rgba(80,40,8,0.04) 19px, rgba(80,40,8,0.04) 20px),
+        repeating-linear-gradient(167deg, transparent 0px, transparent 22px, rgba(140,80,20,0.05) 22px, rgba(140,80,20,0.05) 23px),
+        linear-gradient(180deg, #D9A055 0%, #C4873A 25%, #B87428 50%, #C4873A 75%, #D9A055 100%);
+      border-radius: 20px; padding: 20px 18px 0;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,220,120,0.35), inset 0 -6px 15px rgba(0,0,0,0.18);
+      position: relative; overflow: hidden;
+    }
+    .room::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(to right, transparent, rgba(255,235,150,0.4), transparent); }
+    .book-row { display: grid; grid-template-columns: repeat(var(--cols, 4), 1fr); gap: 14px; align-items: end; padding: 16px 4px 0; }
+    .shelf-plank {
+      height: 20px; margin-bottom: 28px; border-radius: 4px;
+      background: linear-gradient(180deg,#E8A020 0%,#C8860A 20%,#A06808 50%,#C8860A 80%,#E8A020 100%);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,220,100,0.4), inset 0 -2px 0 rgba(0,0,0,0.3);
+    }
+
+    /* ── หนังสือ 3 มิติ ── */
+    :root { --bk-w: 165px; --bk-h: 220px; }
+    @media (max-width: 640px) { :root { --bk-w: 160px; --bk-h: 205px; } }
+    .book-scene { perspective: 800px; display: flex; flex-direction: column; align-items: center; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+    .book-3d { width: 100%; max-width: var(--bk-w); height: var(--bk-h); position: relative; cursor: pointer; transform-style: preserve-3d; transition: transform 0.4s cubic-bezier(0.23,1,0.32,1); filter: drop-shadow(3px 6px 12px rgba(0,0,0,0.45)); }
+    .book-3d:focus-visible { outline: 4px solid #fde047; outline-offset: 4px; }
+    @media (hover: hover) {
+      .book-scene:hover .book-3d { transform: rotateY(-28deg) translateX(7px) translateY(-10px); filter: drop-shadow(7px 14px 20px rgba(0,0,0,0.55)); }
+    }
+    .book-3d:active { transform: scale(0.97); }
+    .book-cover {
+      position: absolute; inset: 0; border-radius: 2px 10px 10px 2px; transform: translateZ(9px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+      padding: 12px 12px 42px 18px; text-align: center; color: #fff; overflow: hidden;
+    }
+    .book-cover::before { content: ''; position: absolute; top: 0; left: 0; width: 14px; height: 100%; background: linear-gradient(to right, rgba(0,0,0,0.42), rgba(0,0,0,0.1), transparent); pointer-events: none; }
+    .book-cover::after { content: ''; position: absolute; top: 4px; right: -7px; width: 8px; height: calc(100% - 8px); background: repeating-linear-gradient(180deg,#f0e6d0 0,#f0e6d0 1px,#ddd0b0 1px,#ddd0b0 2px); border-radius: 0 3px 3px 0; box-shadow: 2px 0 5px rgba(0,0,0,0.18); pointer-events: none; }
+    .cover-ic { color: rgba(255,255,255,0.25); font-size: 22px; }
+    .bk-title {
+      font-size: calc(var(--tfs, 18) * 1px); font-weight: 600; line-height: 1.3;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5); word-break: break-word;
+      display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 6; overflow: hidden;
+    }
+    .cover-media {
+      position: absolute; left: 18px; right: 10px; bottom: 10px;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      background: rgba(255,255,255,0.93); color: #1e3a8a; border-radius: 999px;
+      font-size: 14px; font-weight: 600; padding: 4px 6px; white-space: nowrap;
+    }
+    .book-spine-face { position: absolute; top: 0; left: 0; width: 14px; height: var(--bk-h); transform-origin: left center; transform: rotateY(90deg) translateX(7px); border-radius: 2px 0 0 2px; display: flex; align-items: center; justify-content: center; padding: 4px 2px; overflow: hidden; }
+    .book-spine-face span { writing-mode: vertical-rl; transform: rotate(180deg); color: rgba(255,255,255,0.7); font-size: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-height: 160px; }
+    .pv-badge { position: absolute; top: 6px; right: 4px; z-index: 5; width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.92); color: #2563eb; font-size: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.3); transform: translateZ(12px); pointer-events: none; }
+
+    /* ปุ่มแชร์/แก้ไข/ลบ — เห็นเฉพาะโหมดเจ้าหน้าที่ */
+    .book-actions { display: none; gap: 10px; margin-top: 10px; }
+    body.is-admin .book-actions { display: flex; }
+    .bk-btn { width: 40px; height: 40px; border-radius: 50%; background: #fff; border: none; cursor: pointer; font-size: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; transition: transform 0.15s; }
+    .bk-btn:hover { transform: scale(1.12); }
+    .bk-edit { color: #2563eb; } .bk-del { color: #dc2626; } .bk-share { color: #00a000; }
+
+    /* ── ภาพตัวอย่างลอย (เมาส์ชี้ / กดนิ้วค้าง) ── */
+    #previewPop {
+      position: fixed; z-index: 250; pointer-events: none; width: clamp(230px, min(30vw, calc((88vh - 80px) / 1.414)), 400px);
+      background: #fff; border-radius: 16px; padding: 8px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.06);
+      opacity: 0; transform: translateY(8px) scale(0.95); visibility: hidden;
+      transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s linear 0.18s;
+    }
+    #previewPop.show { opacity: 1; transform: none; visibility: visible; transition: opacity 0.18s ease, transform 0.18s ease; }
+    #previewPop .pv-frame { width: 100%; aspect-ratio: 1 / 1.414; background: #f1f5f9; border-radius: 9px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    #previewPop img { width: 100%; height: 100%; object-fit: contain; background: #fff; display: block; }
+    #previewPop .pv-empty { text-align: center; color: #94a3b8; font-size: 14px; padding: 12px; line-height: 1.5; }
+    #previewPop .pv-empty i { font-size: 34px; display: block; margin-bottom: 8px; color: #cbd5e1; }
+    #previewPop .pv-title { margin-top: 8px; font-size: 16px; font-weight: 500; color: #1e3a8a; text-align: center; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    #previewPop .pv-hint { font-size: 13px; color: #64748b; text-align: center; margin-top: 2px; }
+    @media (max-width: 900px) { #previewPop { width: clamp(230px, min(52vw, calc((86vh - 80px) / 1.414)), 400px); } }
+    @media (max-width: 640px) { #previewPop { width: clamp(220px, min(80vw, calc((84vh - 80px) / 1.414)), 380px); } }
+
+    /* ════════════════════════════════════
+       หน้ารายละเอียดเรื่อง (สำหรับผู้สูงอายุ)
+    ════════════════════════════════════ */
+    #detailView { --s: 1; min-height: 100vh; }
+    .dt-top { position: sticky; top: 0; z-index: 40; background: rgba(255,255,255,0.97); border-bottom: 1px solid #dbeafe; box-shadow: 0 2px 14px rgba(30,58,138,0.14); }
+    .dt-top-in { max-width: 900px; margin: 0 auto; padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
+    .back-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+      min-height: 66px; padding: 0 26px; border: none; border-radius: 18px; cursor: pointer;
+      background: #1d4ed8; color: #fff; font-size: 25px; font-weight: 600;
+      box-shadow: 0 4px 14px rgba(29,78,216,0.4); -webkit-tap-highlight-color: transparent;
+    }
+    .back-btn i { font-size: 26px; }
+    .back-btn:active { transform: scale(0.97); }
+    .back-btn:focus-visible, .pg-btn:focus-visible, .audio-btn:focus-visible, .zoom-btn:focus-visible, .fs-btn:focus-visible, .au-tool:focus-visible, .yt-open:focus-visible { outline: 4px solid #facc15; outline-offset: 2px; }
+    .fs-ctrl { margin-left: auto; display: flex; gap: 8px; }
+    .fs-btn { width: 60px; height: 60px; border-radius: 14px; border: 2px solid #bfdbfe; background: #eff6ff; color: #1e3a8a; font-weight: 700; cursor: pointer; line-height: 1; }
+    .fs-btn.dn { font-size: 19px; } .fs-btn.up { font-size: 27px; }
+    .fs-btn:disabled { opacity: 0.35; cursor: default; }
+    @media (max-width: 400px) { .back-btn { padding: 0 18px; font-size: 23px; } .fs-btn { width: 54px; height: 54px; } }
+
+    .dt-main { max-width: 900px; margin: 0 auto; padding: 22px 16px 60px; }
+    /* ส่วนหัวเรื่อง: ไอคอน + ชื่อเรื่อง บรรทัดเดียวกัน กลางจอ สีเดียวกับปกหนังสือ */
+    .dt-hero {
+      --hl: #1d4ed8; --hd: #1e3a8a;
+      position: relative; overflow: hidden; color: #fff; text-align: center;
+      background: linear-gradient(150deg, var(--hl) 0%, var(--hd) 100%);
+      border-radius: clamp(18px, 3vw, 24px);
+      padding: clamp(14px, 3vw, 24px) clamp(14px, 3.5vw, 30px);
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(15,23,42,0.25), inset 0 1px 0 rgba(255,255,255,0.25);
+    }
+    .dt-hero::before, .dt-hero::after { content: ''; position: absolute; border-radius: 50%; pointer-events: none; }
+    .dt-hero::before { width: 70%; aspect-ratio: 1; top: -38%; left: -18%; background: radial-gradient(circle, rgba(255,255,255,0.22), transparent 65%); animation: heroGlow 6s ease-in-out infinite alternate; }
+    .dt-hero::after { width: 55%; aspect-ratio: 1; bottom: -34%; right: -14%; background: radial-gradient(circle, rgba(255,255,255,0.16), transparent 65%); animation: heroGlow 7s ease-in-out infinite alternate-reverse; }
+    @keyframes heroGlow { from { transform: translate(0, 0) scale(1); } to { transform: translate(6%, 8%) scale(1.12); } }
+    .hero-icon {
+      position: relative; top: -0.06em;
+      width: 1.15em; height: 1.15em; margin-right: 0.28em; border-radius: 50%;
+      vertical-align: middle;
+      background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.6);
+      display: inline-flex; align-items: center; justify-content: center;
+      box-shadow: 0 5px 14px rgba(0,0,0,0.22);
+      animation: heroFloat 3.2s ease-in-out infinite;
+    }
+    .hero-icon::after { content: ''; position: absolute; inset: -2px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.75); animation: heroPulse 2.4s ease-out infinite; }
+    @keyframes heroFloat { 0%,100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-4px) rotate(3deg); } }
+    @keyframes heroPulse { from { transform: scale(1); opacity: 0.9; } to { transform: scale(1.4); opacity: 0; } }
+    .hero-book { width: 74%; height: auto; overflow: visible; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25)); }
+    .hero-book .pg { fill: #ffffff; }
+    .hero-book .ln { fill: none; stroke: #93c5fd; stroke-width: 3; stroke-linecap: round; }
+    .hero-book .spine { stroke: #cbd5e1; stroke-width: 2; }
+    .hero-book .hb-flip { transform-box: view-box; transform-origin: 50px 50px; animation: hbFlip 3.2s ease-in-out infinite; }
+    .hero-book .hb-flip .pg { animation: hbShade 3.2s ease-in-out infinite; }
+    @keyframes hbFlip { 0%, 18% { transform: scaleX(1); } 82%, 100% { transform: scaleX(-1); } }
+    @keyframes hbShade { 0%, 18% { fill: #ffffff; } 50% { fill: #c7dbff; } 82%, 100% { fill: #ffffff; } }
+    .dt-title {
+      position: relative; z-index: 1; margin: 0;
+      font-size: calc(clamp(38px, 9vw, 64px) * var(--s));
+      font-weight: 700; line-height: 1.25; color: #fff; letter-spacing: 0.2px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.35);
+      text-wrap: balance; word-break: break-word;
+    }
+    .dt-desc {
+      font-size: calc(23px * var(--s)); line-height: 1.8; color: #1f2937; white-space: pre-line; word-break: break-word;
+      background: #fff; border-radius: 20px; padding: 20px 22px; margin-bottom: 26px;
+      border-left: 8px solid #3b82f6; box-shadow: 0 6px 22px rgba(30,58,138,0.12);
+    }
+    .dt-empty { text-align: center; color: #64748b; font-size: 22px; padding: 40px 10px; }
+    .dt-sec { background: #fff; border-radius: 22px; padding: 18px; margin-bottom: 26px; box-shadow: 0 8px 28px rgba(30,58,138,0.14); }
+    .sec-head { font-size: calc(26px * var(--s)); font-weight: 600; color: #1e3a8a; display: flex; align-items: center; gap: 12px; margin-bottom: 14px; line-height: 1.3; }
+    .sec-head i { font-size: 30px; color: #2563eb; }
+
+    /* E-Book ทีละหน้า */
+    .pg-counter { font-size: 25px; font-weight: 600; color: #0f172a; text-align: center; margin: 0 0 12px; }
+    .pg-stage { position: relative; width: 100%; max-width: 640px; margin: 0 auto; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 6px 24px rgba(0,0,0,0.2); cursor: zoom-in; touch-action: pan-y pinch-zoom; }
+    .pg-stage.empty { aspect-ratio: 1 / 1.414; min-height: 320px; }
+    .pg-stage img { display: block; width: 100%; height: auto; background: #fff; -webkit-user-drag: none; user-select: none; }
+    .pg-stage img:not([src]) { visibility: hidden; }
+    .pg-stage img.anim-next { animation: pgNext 0.38s ease; }
+    .pg-stage img.anim-prev { animation: pgPrev 0.38s ease; }
+    @keyframes pgNext { from { opacity: 0; transform: perspective(900px) rotateY(-22deg) translateX(40px); } to { opacity: 1; transform: none; } }
+    @keyframes pgPrev { from { opacity: 0; transform: perspective(900px) rotateY(22deg) translateX(-40px); } to { opacity: 1; transform: none; } }
+    .pg-load { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: rgba(248,250,252,0.94); font-size: 22px; color: #1e3a8a; text-align: center; padding: 16px; line-height: 1.5; }
+    .pg-load i { font-size: 46px; color: #3b82f6; }
+    .pg-retry { min-height: 58px; padding: 0 26px; border: none; border-radius: 14px; background: #1d4ed8; color: #fff; font-size: 21px; font-weight: 600; cursor: pointer; }
+    .pg-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 640px; margin: 16px auto 0; }
+    .pg-btn { min-height: 70px; border: none; border-radius: 18px; cursor: pointer; font-size: 23px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; background: #1d4ed8; color: #fff; box-shadow: 0 4px 12px rgba(29,78,216,0.3); -webkit-tap-highlight-color: transparent; }
+    .pg-btn.prev { background: #e0e7ff; color: #1e3a8a; box-shadow: none; border: 2px solid #c7d2fe; }
+    .pg-btn:active:not(:disabled) { transform: scale(0.97); }
+    .pg-btn:disabled { opacity: 0.35; cursor: default; }
+    @media (max-width: 400px) { .pg-btn { font-size: 20px; gap: 6px; } }
+    .zoom-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; max-width: 640px; margin: 12px auto 0; min-height: 62px; border-radius: 16px; border: 2px solid #93c5fd; background: #eff6ff; color: #1e3a8a; font-size: 21px; font-weight: 500; cursor: pointer; }
+    .pg-hint { text-align: center; color: #475569; font-size: 18px; margin-top: 10px; line-height: 1.5; }
+
+    /* วิดีโอ */
+    .video-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; background: #000; box-shadow: 0 6px 20px rgba(0,0,0,0.35); }
+    .video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    .yt-open { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 14px; min-height: 62px; border-radius: 16px; background: #dc2626; color: #fff; font-size: 21px; font-weight: 600; text-decoration: none; }
+    .yt-open i { font-size: 26px; }
+
+    /* เสียง */
+    .audio-btn {
+      width: 100%; display: flex; flex-direction: column; align-items: center; gap: 14px;
+      padding: 28px 16px 26px; border: none; border-radius: 26px; cursor: pointer; color: #fff;
+      background: linear-gradient(135deg, #ea580c, #c2410c); box-shadow: 0 10px 28px rgba(194,65,12,0.4);
+      -webkit-tap-highlight-color: transparent; transition: background 0.25s;
+    }
+    .audio-btn:active { transform: scale(0.98); }
+    .audio-btn.playing { background: linear-gradient(135deg, #16a34a, #15803d); box-shadow: 0 10px 28px rgba(21,128,61,0.4); }
+    .audio-btn.loading { background: linear-gradient(135deg, #64748b, #475569); box-shadow: none; }
+    .audio-btn.error { background: linear-gradient(135deg, #b91c1c, #991b1b); }
+    .audio-icon { width: 150px; height: 150px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 4px solid rgba(255,255,255,0.55); display: flex; align-items: center; justify-content: center; font-size: 74px; position: relative; }
+    .audio-btn.playing .audio-icon::after { content: ''; position: absolute; inset: -4px; border-radius: 50%; border: 4px solid rgba(255,255,255,0.7); animation: auPulse 1.4s ease-out infinite; }
+    @keyframes auPulse { from { transform: scale(1); opacity: 0.9; } to { transform: scale(1.35); opacity: 0; } }
+    .audio-text { font-size: 31px; font-weight: 700; line-height: 1.3; text-align: center; }
+    .audio-sub { font-size: 20px; opacity: 0.95; text-align: center; }
+    @media (max-width: 400px) { .audio-icon { width: 128px; height: 128px; font-size: 62px; } .audio-text { font-size: 27px; } }
+    .audio-prog { margin-top: 16px; }
+    .audio-bar { height: 16px; background: #e5e7eb; border-radius: 999px; overflow: hidden; }
+    .audio-bar > div { height: 100%; width: 0%; background: #ea580c; border-radius: 999px; transition: width 0.25s linear; }
+    .audio-time { text-align: center; font-size: 21px; color: #334155; margin-top: 6px; font-variant-numeric: tabular-nums; }
+    .audio-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+    .au-tool { min-height: 62px; border-radius: 16px; border: 2px solid #fed7aa; background: #fff7ed; color: #9a3412; font-size: 19px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 8px; line-height: 1.25; }
+    .audio-note { margin-top: 14px; font-size: 18px; color: #475569; text-align: center; line-height: 1.5; }
+
+    .back-bottom { width: 100%; margin-top: 6px; }
+
+    /* ── ขยายเต็มจอ ── */
+    #zoomView { position: fixed; inset: 0; z-index: 300; background: #111; display: flex; flex-direction: column; }
+    .zv-top { flex-shrink: 0; display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: #000; }
+    .zv-page { color: #fff; font-size: 23px; font-weight: 600; }
+    .zv-spin { color: #93c5fd; font-size: 22px; }
+    .zv-close { margin-left: auto; min-height: 60px; padding: 0 24px; border: none; border-radius: 16px; background: #facc15; color: #111; font-size: 23px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; }
+    #zvScroll { flex: 1; min-height: 0; overflow: auto; -webkit-overflow-scrolling: touch; display: flex; padding: 8px; touch-action: pan-x pan-y; }
+    #zvImg { display: block; flex-shrink: 0; margin: auto; background: #fff; box-shadow: 0 10px 40px rgba(0,0,0,0.6); user-select: none; -webkit-user-drag: none; }
+    .zv-bottom { flex-shrink: 0; background: #000; padding: 10px; display: grid; gap: 10px; }
+    .zv-row { display: flex; gap: 10px; justify-content: center; align-items: center; }
+    .zv-btn { min-height: 60px; min-width: 60px; border: none; border-radius: 14px; background: #334155; color: #fff; font-size: 21px; font-weight: 600; padding: 0 16px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+    .zv-btn.wide { flex: 1; max-width: 300px; }
+    .zv-btn:disabled { opacity: 0.35; cursor: default; }
+    .zv-pct { color: #fff; font-size: 21px; min-width: 70px; text-align: center; font-variant-numeric: tabular-nums; }
+
+    /* ── ฟอร์มเจ้าหน้าที่ ── */
+    .modal-bg { position: fixed; inset: 0; z-index: 200; background: rgba(0,15,30,0.72); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 14px; }
+    .modal-card { position: relative; background: #fff; border-radius: 24px; width: 100%; max-width: 520px; max-height: 94vh; overflow-y: auto; padding: 26px 24px; box-shadow: 0 25px 60px rgba(0,0,0,0.35); }
+    .modal-x { position: absolute; top: 14px; right: 14px; width: 40px; height: 40px; border: none; border-radius: 50%; background: #f1f5f9; color: #64748b; font-size: 18px; cursor: pointer; }
+    .modal-head { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-right: 40px; }
+    .modal-head .ic { width: 42px; height: 42px; border-radius: 12px; background: #dbeafe; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 19px; }
+    .modal-head h2 { font-size: 24px; color: #1e3a8a; font-weight: 700; }
+    .f-label { display: block; font-size: 16px; font-weight: 500; color: #475569; margin: 16px 0 6px; }
+    .f-label .req { color: #dc2626; } .f-label .opt { color: #94a3b8; font-weight: 400; font-size: 14px; }
+    .f-input { width: 100%; padding: 11px 14px; font-size: 16px; color: #334155; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+    .f-input:focus { border-color: #60a5fa; box-shadow: 0 0 0 3px rgba(96,165,250,0.25); background: #fff; }
+    textarea.f-input { resize: vertical; min-height: 96px; line-height: 1.6; }
+    .f-help { font-size: 13px; color: #64748b; margin-top: 6px; line-height: 1.5; }
+    .drop-zone { border: 2px dashed #60a5fa; border-radius: 16px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .drop-zone:hover, .drop-zone.dragover { border-color: #2563eb; background: #eff6ff; }
+    .drop-zone i { font-size: 30px; color: #93c5fd; display: block; margin-bottom: 6px; }
+    .drop-zone p { font-size: 13px; color: #64748b; word-break: break-all; }
+    .pv-wrap { display: flex; gap: 14px; align-items: flex-start; }
+    .pv-form-box { width: 92px; flex-shrink: 0; aspect-ratio: 1 / 1.414; background: #f1f5f9; border: 2px dashed #bfdbfe; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; color: #93c5fd; font-size: 26px; }
+    .pv-form-box img { width: 100%; height: 100%; object-fit: contain; background: #fff; display: block; }
+    .pv-tools { flex: 1; min-width: 0; }
+    .mini-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .mini-btn { padding: 7px 12px; border-radius: 10px; font-size: 13px; font-weight: 500; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .mini-btn:disabled { opacity: 0.5; cursor: wait; }
+    .mb-blue { background: #eff6ff; color: #2563eb; } .mb-red { background: #fff1f2; color: #e11d48; } .mb-green { background: #ecfdf5; color: #059669; }
+    .pg-input { width: 58px; padding: 6px; text-align: center; font-size: 14px; border: 1.5px solid #e2e8f0; border-radius: 8px; background: #f8fafc; }
+    .pv-status { font-size: 12.5px; color: #94a3b8; line-height: 1.5; }
+    .f-section { margin: 26px 0 0; padding-top: 16px; border-top: 1.5px dashed #e2e8f0; font-size: 18px; font-weight: 600; color: #1e3a8a; }
+    .f-section .opt { color: #94a3b8; font-weight: 400; font-size: 14px; }
+    .f-label i { margin-right: 4px; }
+    .media-choice { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .mc { position: relative; }
+    .mc input { position: absolute; opacity: 0; pointer-events: none; }
+    .mc span { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 78px; padding: 10px 6px; border: 2px solid #e2e8f0; border-radius: 14px; font-size: 14px; color: #475569; cursor: pointer; text-align: center; line-height: 1.25; transition: all 0.15s; }
+    .mc span i { font-size: 22px; }
+    .mc input:checked + span { border-color: #2563eb; background: #eff6ff; color: #1d4ed8; font-weight: 600; }
+    .mc input:focus-visible + span { outline: 3px solid #93c5fd; }
+    .media-box { margin-top: 10px; padding: 14px; background: #f8fafc; border-radius: 14px; border: 1.5px solid #e2e8f0; }
+    .yt-prev { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
+    .yt-prev img { width: 120px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; background: #000; }
+    .yt-ok { font-size: 13px; color: #059669; }
+    .form-actions { display: flex; gap: 10px; margin-top: 24px; }
+    .fa-cancel { flex: 1; min-height: 50px; border: none; border-radius: 14px; background: #f1f5f9; color: #64748b; font-size: 16px; font-weight: 500; cursor: pointer; }
+    .fa-save { flex: 1; min-height: 50px; border: none; border-radius: 14px; background: #2563eb; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .book-icon-anim, .pg-stage img.anim-next, .pg-stage img.anim-prev, .audio-btn.playing .audio-icon::after,
+      .dt-hero::before, .dt-hero::after, .hero-icon, .hero-icon::after, .hero-book .hb-flip, .hero-book .hb-flip .pg { animation: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════ หน้าแรก: ชั้นหนังสือ ════════════ -->
+<div id="mainView">
+  <div class="wrap">
+    <header class="header-card">
+      <button type="button" class="admin-icon" id="adminIcon" onclick="onAdminIcon()" title="สำหรับเจ้าหน้าที่" aria-label="สำหรับเจ้าหน้าที่ เพิ่มหนังสือ">
+        <span class="book-icon-anim"><i class="fas fa-book-medical"></i></span>
+      </button>
+      <div>
+        <h1 class="hd-title">คลังความรู้</h1>
+        <p class="hd-sub">แตะที่หนังสือเพื่อเปิดอ่าน</p>
+      </div>
+    </header>
+
+    <div class="admin-bar" id="adminBar" hidden>
+      <span class="ab-label"><i class="fas fa-user-shield"></i> โหมดเจ้าหน้าที่ — เพิ่ม แก้ไข ลบได้</span>
+      <button type="button" class="ab-btn ab-add" onclick="openForm()"><i class="fas fa-plus-circle"></i> เพิ่มหนังสือใหม่</button>
+      <button type="button" class="ab-btn ab-lock" onclick="lockAdmin()"><i class="fas fa-lock"></i> ออกจากโหมดเจ้าหน้าที่</button>
+    </div>
+
+    <div id="stateLoading" class="state">
+      <i class="fas fa-spinner fa-spin big" style="color:#60a5fa"></i>
+      กำลังจัดเรียงหนังสือบนชั้น...
+    </div>
+    <div id="stateError" class="state" hidden>
+      <i class="fas fa-exclamation-triangle big" style="color:#f87171"></i>
+      <p id="errorMsg" style="color:#b91c1c"></p>
+      <button type="button" class="state-btn" onclick="loadBooks()"><i class="fas fa-rotate-right"></i> ลองใหม่</button>
+    </div>
+    <div id="stateEmpty" class="state" hidden>
+      <i class="fas fa-book-open big" style="color:#93c5fd"></i>
+      ยังไม่มีหนังสือบนชั้นวาง
+    </div>
+    <div id="stateShelf" hidden>
+      <div id="shelfContainer" class="room"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ หน้ารายละเอียดเรื่อง ════════════ -->
+<div id="detailView" hidden>
+  <div class="dt-top">
+    <div class="dt-top-in">
+      <button type="button" class="back-btn" id="btnBackTop" onclick="goBack()"><i class="fas fa-arrow-left"></i> ย้อนกลับ</button>
+      <div class="fs-ctrl">
+        <button type="button" class="fs-btn dn" id="fsDown" onclick="changeFs(-1)" aria-label="ลดขนาดตัวอักษร" title="ลดขนาดตัวอักษร">ก−</button>
+        <button type="button" class="fs-btn up" id="fsUp" onclick="changeFs(1)" aria-label="เพิ่มขนาดตัวอักษร" title="เพิ่มขนาดตัวอักษร">ก+</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="dt-main">
+    <header class="dt-hero" id="dtHero">
+      <h1 class="dt-title"><span class="hero-icon" aria-hidden="true">
+        <svg class="hero-book" viewBox="0 0 100 100">
+          <path class="pg" d="M50 26 C40 19 24 17 12 20 L12 76 C24 73 40 75 50 82 Z"/>
+          <path class="ln" d="M20 34 Q32 31 43 36 M20 45 Q32 42 43 47 M20 56 Q32 53 43 58"/>
+          <path class="pg" d="M50 26 C60 19 76 17 88 20 L88 76 C76 73 60 75 50 82 Z"/>
+          <path class="ln" d="M57 36 Q68 31 80 34 M57 47 Q68 42 80 45 M57 58 Q68 53 80 56"/>
+          <g class="hb-flip">
+            <path class="pg" d="M50 26 C60 19 76 17 88 20 L88 76 C76 73 60 75 50 82 Z"/>
+            <path class="ln" d="M57 36 Q68 31 80 34 M57 47 Q68 42 80 45 M57 58 Q68 53 80 56"/>
+          </g>
+          <line class="spine" x1="50" y1="26" x2="50" y2="82"/>
+        </svg></span><span id="dtTitle"></span></h1>
+    </header>
+    <div class="dt-desc" id="dtDesc" hidden></div>
+    <p class="dt-empty" id="dtEmpty" hidden>เรื่องนี้ยังไม่มีเนื้อหา</p>
+
+    <!-- PDF แบบ E-Book ทีละหน้า -->
+    <section class="dt-sec" id="secPdf" hidden>
+      <h2 class="sec-head"><i class="fas fa-book-open"></i> อ่านเอกสาร</h2>
+      <div class="pg-counter" id="pgCounter">&nbsp;</div>
+      <div class="pg-stage empty" id="pgStage">
+        <img id="pgImg" alt="">
+        <div class="pg-load" id="pgLoad">
+          <i class="fas fa-spinner fa-spin" id="pgLoadIc"></i>
+          <span id="pgLoadTxt">กำลังโหลดเอกสาร<br>กรุณารอสักครู่</span>
+          <button type="button" class="pg-retry" id="pgRetry" hidden>ลองใหม่</button>
+        </div>
+      </div>
+      <div class="pg-nav">
+        <button type="button" class="pg-btn prev" id="pgPrev" onclick="pvGo(-1)" disabled><i class="fas fa-chevron-left"></i> หน้าก่อน</button>
+        <button type="button" class="pg-btn next" id="pgNext" onclick="pvGo(1)" disabled>หน้าถัดไป <i class="fas fa-chevron-right"></i></button>
+      </div>
+      <button type="button" class="zoom-btn" id="pgZoom" onclick="openZoom()" disabled><i class="fas fa-magnifying-glass-plus"></i> ขยายให้ใหญ่เต็มจอ</button>
+      <p class="pg-hint">ปัดนิ้วไปทางซ้ายหรือขวาเพื่อเปลี่ยนหน้า<br>แตะที่หน้ากระดาษเพื่อขยาย</p>
+    </section>
+
+    <!-- ไฟล์เสียง (ต่อจากเอกสาร) -->
+    <section class="dt-sec" id="secAudio" hidden>
+      <h2 class="sec-head"><i class="fas fa-headphones"></i> ฟังคำอธิบาย</h2>
+      <button type="button" class="audio-btn" id="auBtn" onclick="auBtnClick()">
+        <span class="audio-icon"><i class="fas fa-volume-high" id="auIcon"></i></span>
+        <span class="audio-text" id="auText">กดเพื่อฟังคำอธิบาย</span>
+        <span class="audio-sub" id="auSub"></span>
+      </button>
+      <div class="audio-prog" id="auProg">
+        <div class="audio-bar"><div id="auBar"></div></div>
+        <div class="audio-time" id="auTime">0:00 / 0:00</div>
+      </div>
+      <div class="audio-tools" id="auTools">
+        <button type="button" class="au-tool" onclick="auSeek(-10)"><i class="fas fa-rotate-left"></i> ย้อน 10 วินาที</button>
+        <button type="button" class="au-tool" onclick="auRestart()"><i class="fas fa-backward-step"></i> ฟังใหม่ตั้งแต่ต้น</button>
+      </div>
+      <p class="audio-note"><i class="fas fa-circle-info"></i> หากไม่ได้ยินเสียง กรุณาเพิ่มเสียงโทรศัพท์ หรือปิดโหมดเงียบ</p>
+      <audio id="auEl" preload="auto" playsinline></audio>
+    </section>
+
+    <!-- วิดีโอ YouTube (ต่อจากไฟล์เสียง) -->
+    <section class="dt-sec" id="secVideo" hidden>
+      <h2 class="sec-head"><i class="fab fa-youtube" style="color:#dc2626"></i> ดูวิดีโอ</h2>
+      <div id="videoWrap"></div>
+      <a class="yt-open" id="ytOpen" href="#" target="_blank" rel="noopener"><i class="fab fa-youtube"></i> เปิดดูใน YouTube</a>
+    </section>
+
+    <button type="button" class="back-btn back-bottom" onclick="goBack()"><i class="fas fa-arrow-left"></i> กลับไปหน้าชั้นหนังสือ</button>
+  </main>
+</div>
+
+<!-- ════════════ ขยายเต็มจอ ════════════ -->
+<div id="zoomView" hidden>
+  <div class="zv-top">
+    <span class="zv-page" id="zvPage">หน้า 1 / 1</span>
+    <i class="fas fa-spinner fa-spin zv-spin" id="zvSpin" hidden></i>
+    <button type="button" class="zv-close" onclick="closeZoom()"><i class="fas fa-xmark"></i> ปิด</button>
+  </div>
+  <div id="zvScroll"><img id="zvImg" alt=""></div>
+  <div class="zv-bottom">
+    <div class="zv-row">
+      <button type="button" class="zv-btn" id="zvOut" onclick="zvSetZoom(ZV.zoom - 0.5)"><i class="fas fa-magnifying-glass-minus"></i> ย่อ</button>
+      <span class="zv-pct" id="zvPct">100%</span>
+      <button type="button" class="zv-btn" id="zvIn" onclick="zvSetZoom(ZV.zoom + 0.5)"><i class="fas fa-magnifying-glass-plus"></i> ขยาย</button>
+    </div>
+    <div class="zv-row">
+      <button type="button" class="zv-btn wide" id="zvPrev" onclick="pvGo(-1)"><i class="fas fa-chevron-left"></i> หน้าก่อน</button>
+      <button type="button" class="zv-btn wide" id="zvNext" onclick="pvGo(1)">หน้าถัดไป <i class="fas fa-chevron-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- ภาพตัวอย่างลอย -->
+<div id="previewPop" aria-hidden="true">
+  <div class="pv-frame" id="pvFrame"></div>
+  <div class="pv-title" id="pvTitle"></div>
+  <div class="pv-hint" id="pvHint"></div>
+</div>
+
+<!-- ════════════ ฟอร์มเพิ่ม/แก้ไข (เจ้าหน้าที่) ════════════ -->
+<div id="formModal" class="modal-bg" hidden>
+  <div class="modal-card">
+    <button type="button" class="modal-x" onclick="closeForm()" aria-label="ปิด"><i class="fas fa-times"></i></button>
+    <div class="modal-head">
+      <div class="ic"><i class="fas fa-book"></i></div>
+      <h2 id="modalTitle">เพิ่มหนังสือใหม่</h2>
+    </div>
+    <form id="bookForm" onsubmit="handleSave(event)" novalidate>
+      <label class="f-label" for="bookTitle">ชื่อเรื่อง <span class="req">*</span></label>
+      <input type="text" id="bookTitle" class="f-input" maxlength="200" placeholder="เช่น การดูแลเส้นฟอกเลือดที่บ้าน">
+
+      <label class="f-label" for="bookDesc">คำอธิบายเพิ่มเติม <span class="opt">(แสดงใต้ชื่อเรื่อง)</span></label>
+      <textarea id="bookDesc" class="f-input" rows="4" placeholder="อธิบายสั้น ๆ ว่าเรื่องนี้เกี่ยวกับอะไร ควรอ่านเมื่อไร"></textarea>
+
+      <label class="f-label">ไฟล์ PDF <span class="opt">(ไม่บังคับ)</span></label>
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="bookFile" accept="application/pdf" hidden>
+        <i class="fas fa-file-pdf"></i>
+        <p id="fileName">คลิกหรือลากไฟล์ PDF มาวางที่นี่</p>
+      </div>
+
+      <label class="f-label"><i class="fas fa-image" style="color:#93c5fd"></i> ภาพตัวอย่างหน้าเดียว</label>
+      <div class="pv-wrap">
+        <div class="pv-form-box">
+          <i class="fas fa-file-image" id="pvFormEmpty"></i>
+          <img id="pvFormImg" alt="ภาพตัวอย่าง" hidden>
+        </div>
+        <div class="pv-tools">
+          <input type="file" id="previewFile" accept="image/*" hidden>
+          <div class="mini-row">
+            <button type="button" class="mini-btn mb-blue" onclick="byId('previewFile').click()"><i class="fas fa-upload"></i>อัปโหลดรูป</button>
+            <button type="button" class="mini-btn mb-red" id="pvClearBtn" onclick="clearPreview()"><i class="fas fa-trash"></i>ลบภาพ</button>
+          </div>
+          <div class="mini-row">
+            <span style="font-size:13px;color:#64748b">ดึงจาก PDF หน้าที่</span>
+            <input type="number" id="pvPage" class="pg-input" min="1" value="1">
+            <button type="button" class="mini-btn mb-green" id="pvGenBtn" onclick="genPreviewFromPdf()"><i class="fas fa-wand-magic-sparkles"></i>ดึงภาพ</button>
+          </div>
+          <p class="pv-status" id="pvStatus"></p>
+        </div>
+      </div>
+
+      <p class="f-section">สื่อประกอบ <span class="opt">(แนบได้ทั้งสองอย่าง หรือไม่แนบก็ได้)</span></p>
+
+      <label class="f-label"><i class="fas fa-volume-high" style="color:#ea580c"></i> ไฟล์เสียงคำอธิบาย <span class="opt">(ไม่บังคับ)</span></label>
+      <div class="media-box" id="auBox">
+        <input type="file" id="audioFile" accept="audio/*,.mp3,.m4a,.wav,.aac,.ogg" hidden>
+        <div class="mini-row" style="margin-bottom:0">
+          <button type="button" class="mini-btn mb-blue" style="font-size:14px;padding:10px 14px" onclick="byId('audioFile').click()"><i class="fas fa-upload"></i><span id="auPickLabel">เลือกไฟล์เสียง</span></button>
+          <button type="button" class="mini-btn mb-red" style="font-size:14px;padding:10px 14px" id="auRemoveBtn" onclick="removeAudio()" hidden><i class="fas fa-trash"></i>ลบไฟล์เสียง</button>
+        </div>
+        <p class="f-help" id="auFileName" style="color:#334155;font-size:14px">ยังไม่มีไฟล์เสียง</p>
+        <p class="f-help">ไฟล์ MP3 หรือ M4A ขนาดไม่เกิน 20 MB ระบบจะอัปโหลดขึ้น Google Drive ให้อัตโนมัติ</p>
+      </div>
+
+      <label class="f-label" for="ytUrl"><i class="fab fa-youtube" style="color:#dc2626"></i> ลิงก์วิดีโอ YouTube <span class="opt">(ไม่บังคับ)</span></label>
+      <div class="media-box" id="ytBox">
+        <input type="text" id="ytUrl" class="f-input" placeholder="วางลิงก์ YouTube เช่น https://youtu.be/xxxxxxxxxxx">
+        <p class="f-help">วางลิงก์จากปุ่ม "แชร์" ของ YouTube หรือโค้ดฝัง (iframe) ก็ได้ — ลบข้อความออกให้ว่างเพื่อเอาวิดีโอออก</p>
+        <div class="yt-prev" id="ytPrev" hidden><img id="ytThumb" alt=""><span class="yt-ok"><i class="fas fa-check-circle"></i> ลิงก์ใช้ได้</span></div>
+        <p class="f-help" id="ytBad" style="color:#dc2626" hidden><i class="fas fa-circle-exclamation"></i> ลิงก์นี้ไม่ใช่ลิงก์ YouTube ที่ใช้ได้</p>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="fa-cancel" onclick="closeForm()">ยกเลิก</button>
+        <button type="submit" class="fa-save"><i class="fas fa-save"></i> บันทึก</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ==========================================
+// ⚙️ ตั้งค่า
+// ==========================================
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbwnHwxZI96_IAXmvvDmLRlqQFB_rrq-tnt1ylTV-3TgTFZXilifGFqdPd6su3W9zik8/exec';
+var PREVIEW_COL = 'Preview Image';
+var PREVIEW_MAX_CHARS = 1200000;
+var MAX_PDF_MB = 25;
+var MAX_AUDIO_MB = 20;
+var MAX_TOTAL_MB = 30;   // PDF + เสียง ในการบันทึกครั้งเดียว (Apps Script รับได้ไม่เกินราว 50 MB หลังแปลงไฟล์)
+var LONG_PRESS_MS = 450;
+var PALETTE = [
+  ['#047857','#022c22'],['#0369a1','#0c2d48'],['#6d28d9','#2e1065'],
+  ['#be185d','#500724'],['#b45309','#451a03'],['#b91c1c','#450a0a'],
+  ['#0e7490','#042f2e'],['#4338ca','#1e1b4b'],['#166534','#052e16'],
+  ['#92400e','#292524'],['#1d4ed8','#1e3a8a'],['#9d174d','#4a044e']
+];
+
+var bookData = [];
+var ADMIN_PIN = '';
+var curBook = null;
+var SHELF_Y = 0;
+var shelfColsNow = 0;
+var deepLinkDone = false;
+
+function byId(id) { return document.getElementById(id); }
+function escHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) { return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); }
+function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+function noop() {}
+function b64ToBytes(b64) { var bin = atob(b64), bytes = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i); return bytes; }
+
+// ==========================================
+// 🔌 เชื่อมต่อ Apps Script
+// ==========================================
+var READ_ACTIONS = { ptGetBooks: 1, getPdfData: 1, ptVerifyPin: 1 };
+
+function callBackend(action, payload) {
+  payload = payload || {};
+  return new Promise(function(resolve, reject) {
+    function done(data) {
+      if (data && (data.error || data.success === false)) {
+        var msg = data.error || data.message || 'ทำรายการไม่สำเร็จ';
+        if (/Unknown Action/i.test(msg)) msg = 'ยังไม่ได้เพิ่มโค้ด PatientLib ใน Apps Script หรือยังไม่ได้ Deploy เวอร์ชันใหม่';
+        reject(new Error(msg));
+      } else resolve(data);
+    }
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      var r = google.script.run.withSuccessHandler(done).withFailureHandler(reject);
+      if (action === 'getPdfData') r.getPdfData(payload.fileId); else r[action](payload);
+      return;
+    }
+    var maxTry = READ_ACTIONS[action] ? 4 : 1;   // อ่านข้อมูลลองซ้ำได้ / บันทึก-ลบ ไม่ลองซ้ำเอง
+    var body = JSON.stringify(payload);
+    (function attempt(n) {
+      fetch(GAS_URL + '?action=' + encodeURIComponent(action), { method: 'POST', body: body, headers: { 'Content-Type': 'text/plain;charset=utf-8' } })
+        .then(function(res) { return res.text(); })
+        .then(function(txt) {
+          var data;
+          try { data = JSON.parse(txt); } catch (e) { throw new Error(/^\s*</.test(txt) ? 'HTML' : txt.slice(0, 80)); }
+          done(data);
+        })
+        .catch(function(err) {
+          if (n < maxTry) { setTimeout(function() { attempt(n + 1); }, 700 * n); return; }
+          if (err.message === 'HTML') err = new Error('เซิร์ฟเวอร์ตอบกลับไม่ทัน กรุณาลองใหม่อีกครั้ง');
+          reject(err);
+        });
+    })(1);
+  });
+}
+
+// ==========================================
+// 📚 ชั้นหนังสือ
+// ==========================================
+function setState(s, msg) {
+  ['Loading', 'Error', 'Empty', 'Shelf'].forEach(function(n) { byId('state' + n).hidden = (n !== s); });
+  if (s === 'Error' && msg) byId('errorMsg').textContent = msg;
+}
+
+function loadBooks() {
+  setState('Loading');
+  return callBackend('ptGetBooks').then(function(res) {
+    bookData = (Array.isArray(res) ? res : []).filter(function(b) { return b && String(b['Book Title'] || '').trim(); });
+    if (!bookData.length) setState('Empty'); else { renderBooks(); setState('Shelf'); }
+    handleDeepLink();
+  }).catch(function(err) { setState('Error', 'เชื่อมต่อไม่ได้: ' + err.message); });
+}
+
+function shelfCols() { var w = window.innerWidth; return w <= 520 ? 2 : (w <= 860 ? 3 : 4); }
+
+function renderBooks() {
+  hidePreview();
+  var cols = shelfCols(); shelfColsNow = cols;
+  var container = byId('shelfContainer'); container.innerHTML = '';
+  for (var i = 0; i < bookData.length; i += cols) {
+    var unit = document.createElement('div'); unit.className = 'shelf-unit';
+    var row = document.createElement('div'); row.className = 'book-row'; row.style.setProperty('--cols', cols);
+    for (var j = i; j < Math.min(i + cols, bookData.length); j++) row.appendChild(makeBook(bookData[j], j));
+    var plank = document.createElement('div'); plank.className = 'shelf-plank';
+    unit.appendChild(row); unit.appendChild(plank); container.appendChild(unit);
+  }
+}
+
+function getPreviewOf(book) {
+  var v = String(book[PREVIEW_COL] || '').trim();
+  return (/^data:image\//.test(v) || /^https?:\/\//.test(v)) ? v : '';
+}
+
+function titleSize(t) {
+  var n = String(t).length;
+  var s = n <= 10 ? 26 : n <= 20 ? 22 : n <= 36 ? 19 : n <= 60 ? 16 : 14;
+  return window.innerWidth <= 640 ? s : s - 1;
+}
+
+function makeBook(book, idx) {
+  var pair = PALETTE[idx % PALETTE.length], L = pair[0], D = pair[1];
+  var title = String(book['Book Title'] || '(ไม่มีชื่อ)'), t = escHtml(title);
+  var au = hasAudio(book), vd = hasVideo(book);
+  var mediaPill = (au && vd) ? '<div class="cover-media"><i class="fas fa-volume-high"></i> เสียง <i class="fab fa-youtube" style="color:#dc2626"></i> วิดีโอ</div>'
+                : au ? '<div class="cover-media"><i class="fas fa-volume-high"></i> มีเสียง</div>'
+                : vd ? '<div class="cover-media"><i class="fab fa-youtube" style="color:#dc2626"></i> มีวิดีโอ</div>' : '';
+
+  var scene = document.createElement('div'); scene.className = 'book-scene';
+  scene.innerHTML =
+    '<div class="book-3d" role="button" tabindex="0" aria-label="เปิดอ่านเรื่อง ' + t + '">' +
+      '<div class="book-spine-face" style="background:' + D + ';"><span>' + t + '</span></div>' +
+      '<div class="book-cover" style="background:linear-gradient(150deg,' + L + ',' + D + ');--tfs:' + titleSize(title) + '">' +
+        '<i class="fas fa-book cover-ic"></i><span class="bk-title">' + t + '</span>' + mediaPill +
+      '</div>' +
+      (getPreviewOf(book) ? '<div class="pv-badge" title="มีภาพตัวอย่าง"><i class="fas fa-eye"></i></div>' : '') +
+    '</div>' +
+    '<div class="book-actions">' +
+      '<button type="button" class="bk-btn bk-share" data-act="share" title="ส่งลิงก์ทาง LINE"><i class="fas fa-share-alt"></i></button>' +
+      '<button type="button" class="bk-btn bk-edit" data-act="edit" title="แก้ไข"><i class="fas fa-pen"></i></button>' +
+      '<button type="button" class="bk-btn bk-del" data-act="del" title="ลบ"><i class="fas fa-trash"></i></button>' +
+    '</div>';
+
+  var b3 = scene.querySelector('.book-3d');
+  b3.addEventListener('click', function() { openBook(idx); });
+  b3.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openBook(idx); } });
+  scene.querySelector('[data-act=share]').addEventListener('click', function(e) { e.stopPropagation(); shareBook(idx); });
+  scene.querySelector('[data-act=edit]').addEventListener('click', function(e) { e.stopPropagation(); requireAdmin(function() { openForm(idx); }); });
+  scene.querySelector('[data-act=del]').addEventListener('click', function(e) { e.stopPropagation(); confirmDelete(idx); });
+  bindPreviewEvents(b3, book, idx);
+  return scene;
+}
+
+// ════════════════════════════════════════
+// 👁️ ภาพตัวอย่างลอย (เมาส์ชี้ / กดนิ้วค้าง แล้วปล่อยเพื่อเปิดอ่าน)
+// ════════════════════════════════════════
+var pvTimer = null, pvLongPressed = false, lastTouchTs = 0, suppressClickUntil = 0;
+
+function openBook(idx) {
+  if (Date.now() < suppressClickUntil) return;
+  hidePreview();
+  openDetail(bookData[idx], true);
+}
+
+function bindPreviewEvents(b3, book, idx) {
+  b3.addEventListener('mouseenter', function() { if (Date.now() - lastTouchTs < 900) return; showPreview(book, b3, false); });
+  b3.addEventListener('mouseleave', hidePreview);
+
+  var sx = 0, sy = 0;
+  b3.addEventListener('touchstart', function(e) {
+    lastTouchTs = Date.now();
+    if (e.touches.length !== 1) { clearTimeout(pvTimer); return; }
+    var t = e.touches[0]; sx = t.clientX; sy = t.clientY;
+    pvLongPressed = false; clearTimeout(pvTimer);
+    pvTimer = setTimeout(function() {
+      pvLongPressed = true; showPreview(book, b3, true);
+      if (navigator.vibrate) { try { navigator.vibrate(12); } catch (_) {} }
+    }, LONG_PRESS_MS);
+  }, { passive: true });
+  b3.addEventListener('touchmove', function(e) {
+    if (!e.touches.length) return;
+    var t = e.touches[0];
+    if (Math.abs(t.clientX - sx) > 12 || Math.abs(t.clientY - sy) > 12) {
+      clearTimeout(pvTimer);
+      if (pvLongPressed) { pvLongPressed = false; hidePreview(); }
+    }
+  }, { passive: true });
+  b3.addEventListener('touchend', function() {
+    lastTouchTs = Date.now(); clearTimeout(pvTimer);
+    if (pvLongPressed) {          // กดค้างแล้วปล่อย = เปิดอ่านเลย (ผู้สูงอายุมักกดนาน)
+      pvLongPressed = false; hidePreview();
+      suppressClickUntil = Date.now() + 700;
+      openDetail(bookData[idx], true);
+    }
+  }, { passive: true });
+  b3.addEventListener('touchcancel', function() { clearTimeout(pvTimer); if (pvLongPressed) { pvLongPressed = false; hidePreview(); } }, { passive: true });
+  b3.addEventListener('contextmenu', function(e) { if (Date.now() - lastTouchTs < 1500) e.preventDefault(); });
+}
+
+function showPreview(book, anchorEl, centered) {
+  var pop = byId('previewPop'), frame = byId('pvFrame'), url = getPreviewOf(book);
+  byId('pvTitle').textContent = String(book['Book Title'] || '');
+  frame.innerHTML = '';
+  if (url) {
+    var img = new Image(); img.alt = 'ตัวอย่างหน้าหนังสือ'; img.src = url; frame.appendChild(img);
+  } else {
+    frame.innerHTML = '<div class="pv-empty"><i class="fas fa-image"></i>ยังไม่มีภาพตัวอย่าง</div>';
+  }
+  byId('pvHint').textContent = centered ? 'ปล่อยนิ้วเพื่อเปิดอ่าน' : 'คลิกเพื่อเปิดอ่าน';
+
+  var vw = window.innerWidth, vh = window.innerHeight, pw = pop.offsetWidth, ph = pop.offsetHeight, left, top;
+  if (centered) { left = (vw - pw) / 2; top = (vh - ph) / 2; }
+  else {
+    var r = anchorEl.getBoundingClientRect();
+    left = r.right + 4;
+    if (left + pw > vw - 8) left = r.left - pw - 4;
+    if (left < 8) left = Math.max(8, (vw - pw) / 2);
+    top = r.top + r.height / 2 - ph / 2;
+  }
+  pop.style.left = Math.min(Math.max(8, left), Math.max(8, vw - pw - 8)) + 'px';
+  pop.style.top = Math.min(Math.max(8, top), Math.max(8, vh - ph - 8)) + 'px';
+  pop.classList.add('show'); pop.setAttribute('aria-hidden', 'false');
+}
+function hidePreview() { var pop = byId('previewPop'); if (!pop) return; pop.classList.remove('show'); pop.setAttribute('aria-hidden', 'true'); }
+
+// ════════════════════════════════════════
+// 📖 หน้ารายละเอียดเรื่อง + ปุ่มย้อนกลับ (รองรับปุ่มย้อนกลับของโทรศัพท์)
+// ════════════════════════════════════════
+function ytId(s) {
+  s = String(s || '').trim(); if (!s) return '';
+  var m = s.match(/src=["']([^"']+)["']/i); if (m) s = m[1];
+  m = s.match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:embed\/|shorts\/|live\/|v\/|watch\?(?:[^#]*&)?v=))([A-Za-z0-9_-]{11})/);
+  if (m) return m[1];
+  return /^[A-Za-z0-9_-]{11}$/.test(s) ? s : '';
+}
+function hasAudio(b) { return !!String(b['Audio File ID'] || '').trim(); }
+function hasVideo(b) { return !!ytId(b['Video URL']); }
+function bookId(b) { return (b['ID'] !== '' && b['ID'] != null) ? String(b['ID']) : 'r' + b.rowIndex; }
+function findBook(id) { for (var i = 0; i < bookData.length; i++) if (bookId(bookData[i]) === id) return bookData[i]; return null; }
+function hashParam(k) { var h = location.hash.replace(/^#/, ''); if (!h) return ''; try { return new URLSearchParams(h).get(k) || ''; } catch (e) { return ''; } }
+function baseUrl() { return location.pathname + location.search; }
+
+function openDetail(book, push) {
+  if (!book) return;
+  hidePreview();
+  if (!curBook) SHELF_Y = window.pageYOffset || 0; else stopDetailMedia();
+  curBook = book;
+  if (push) { try { history.pushState({ pt: 'detail' }, '', '#b=' + encodeURIComponent(bookId(book))); } catch (e) {} }
+
+  byId('mainView').hidden = true;
+  byId('detailView').hidden = false;
+  window.scrollTo(0, 0);
+
+  var title = String(book['Book Title'] || '');
+  byId('dtTitle').textContent = title;
+  document.title = title + ' | คลังความรู้';
+  var desc = String(book['Description'] || '').trim();
+  byId('dtDesc').textContent = desc; byId('dtDesc').hidden = !desc;
+
+  var fid = String(book['File ID'] || '');
+  byId('secPdf').hidden = !fid;
+  if (fid) pvLoad(fid);
+
+  var au = hasAudio(book), vd = hasVideo(book);
+  byId('secAudio').hidden = !au;
+  byId('secVideo').hidden = !vd;
+  if (au) auSetup(book);
+  if (vd) showVideo(book['Video URL']);
+  byId('dtEmpty').hidden = !!(fid || desc || au || vd);
+
+  // สีส่วนหัว = สีเดียวกับปกหนังสือที่แตะเข้ามา
+  var bi = bookData.indexOf(book), pair = PALETTE[(bi < 0 ? 0 : bi) % PALETTE.length];
+  byId('dtHero').style.setProperty('--hl', pair[0]);
+  byId('dtHero').style.setProperty('--hd', pair[1]);
+  try { byId('btnBackTop').focus({ preventScroll: true }); } catch (e) {}
+}
+
+function stopDetailMedia() {
+  auReset();
+  byId('videoWrap').innerHTML = '';
+  pvReset();
+  if (zoomOpen) closeZoomUI();
+}
+
+function closeDetailUI() {
+  if (!curBook) return;
+  stopDetailMedia();
+  curBook = null;
+  byId('detailView').hidden = true;
+  byId('mainView').hidden = false;
+  document.title = 'คลังความรู้';
+  window.scrollTo(0, SHELF_Y);
+}
+
+function goBack() {
+  var st = history.state;
+  if (st && st.pt === 'detail') { history.back(); return; }
+  try { history.replaceState(null, '', baseUrl()); } catch (e) {}
+  closeDetailUI();
+}
+
+function route() {
+  var b = hashParam('b'), z = hashParam('z');
+  if (b) {
+    if (!curBook || bookId(curBook) !== b) {
+      var bk = findBook(b);
+      if (bk) openDetail(bk, false); else { if (zoomOpen) closeZoomUI(); closeDetailUI(); return; }
+    }
+    if (!z && zoomOpen) closeZoomUI();
+  } else {
+    if (zoomOpen) closeZoomUI();
+    closeDetailUI();
+  }
+}
+window.addEventListener('popstate', route);
+
+// เปิดจากลิงก์ที่แชร์ (…#b=รหัสเรื่อง) — ให้ปุ่มย้อนกลับพากลับมาที่ชั้นหนังสือ
+function handleDeepLink() {
+  if (deepLinkDone) return; deepLinkDone = true;
+  var b = hashParam('b'); if (!b) return;
+  var bk = findBook(b);
+  try { history.replaceState(null, '', baseUrl()); } catch (e) {}
+  if (!bk) return;
+  try { history.pushState({ pt: 'detail' }, '', '#b=' + encodeURIComponent(b)); } catch (e) {}
+  openDetail(bk, false);
+}
+
+function showVideo(url) {
+  var id = ytId(url); if (!id) return;
+  byId('videoWrap').innerHTML = '<div class="video-frame"><iframe src="https://www.youtube.com/embed/' + id + '?rel=0&playsinline=1" title="วิดีโอประกอบ" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>';
+  byId('ytOpen').href = 'https://www.youtube.com/watch?v=' + id;
+}
+
+// ขนาดตัวอักษร (จำไว้ในเครื่อง)
+var FS_STEPS = [0.9, 1, 1.15, 1.3, 1.5], fsIdx = 1;
+try { var _fs = localStorage.getItem('pt_fs'); if (_fs !== null && !isNaN(+_fs)) fsIdx = clamp(+_fs, 0, FS_STEPS.length - 1); } catch (e) {}
+function applyFs() {
+  byId('detailView').style.setProperty('--s', FS_STEPS[fsIdx]);
+  byId('fsDown').disabled = fsIdx === 0;
+  byId('fsUp').disabled = fsIdx === FS_STEPS.length - 1;
+}
+function changeFs(d) { fsIdx = clamp(fsIdx + d, 0, FS_STEPS.length - 1); applyFs(); try { localStorage.setItem('pt_fs', String(fsIdx)); } catch (e) {} }
+
+// ════════════════════════════════════════
+// 📄 PDF แบบ E-Book ทีละหน้า
+// ════════════════════════════════════════
+var PV = { token: 0, pdf: null, n: 0, cur: 1, pages: {}, pending: {}, fileId: '' };
+var PDF_CACHE = [];
+var pgLoadTimer = null;
+
+function cacheGet(id) { for (var i = 0; i < PDF_CACHE.length; i++) if (PDF_CACHE[i].id === id) return PDF_CACHE[i].bytes; return null; }
+function cachePut(id, bytes) {
+  PDF_CACHE = PDF_CACHE.filter(function(e) { return e.id !== id; });
+  PDF_CACHE.unshift({ id: id, bytes: bytes });
+  if (PDF_CACHE.length > 3) PDF_CACHE.pop();
+}
+
+function pvReset() {
+  PV.token++;
+  if (PV.pdf) { try { PV.pdf.destroy(); } catch (e) {} }
+  Object.keys(PV.pages).forEach(function(k) { var u = PV.pages[k].url; if (u && u.indexOf('blob:') === 0) URL.revokeObjectURL(u); });
+  PV.pdf = null; PV.n = 0; PV.cur = 1; PV.pages = {}; PV.pending = {}; PV.fileId = '';
+  clearTimeout(pgLoadTimer);
+  var img = byId('pgImg'); img.removeAttribute('src'); img.removeAttribute('width'); img.removeAttribute('height');
+  byId('pgStage').classList.add('empty');
+  byId('pgCounter').innerHTML = '&nbsp;';
+  byId('pgPrev').disabled = true; byId('pgNext').disabled = true; byId('pgZoom').disabled = true;
+}
+
+function pvMsg(html, spin, retry) {
+  byId('pgLoad').hidden = false;
+  byId('pgLoadTxt').innerHTML = html;
+  byId('pgLoadIc').className = spin ? 'fas fa-spinner fa-spin' : 'fas fa-circle-exclamation';
+  byId('pgLoadIc').style.color = spin ? '' : '#dc2626';
+  byId('pgRetry').hidden = !retry;
+}
+function pvHideMsg() { clearTimeout(pgLoadTimer); byId('pgLoad').hidden = true; byId('zvSpin').hidden = true; }
+
+function pvLoad(fileId) {
+  pvReset();
+  var tk = PV.token;
+  PV.fileId = fileId;
+  pvMsg('กำลังโหลดเอกสาร<br>กรุณารอสักครู่', true, false);
+  var cached = cacheGet(fileId);
+  var getBytes = cached ? Promise.resolve(cached) : callBackend('getPdfData', { fileId: fileId }).then(function(res) {
+    var bytes = b64ToBytes(res.data); cachePut(fileId, bytes); return bytes;
+  });
+  getBytes.then(function(bytes) {
+    if (tk !== PV.token) return null;
+    return pdfjsLib.getDocument({ data: bytes.slice() }).promise;
+  }).then(function(pdf) {
+    if (!pdf) return;
+    if (tk !== PV.token) { try { pdf.destroy(); } catch (e) {} return; }
+    PV.pdf = pdf; PV.n = pdf.numPages; PV.cur = 1;
+    byId('pgZoom').disabled = false;
+    pvShow(1, '');
+  }).catch(function(err) {
+    if (tk !== PV.token) return;
+    pvMsg('เปิดเอกสารไม่สำเร็จ<br><small style="font-size:16px;color:#64748b">' + escHtml(err.message) + '</small>', false, true);
+  });
+}
+byId('pgRetry').addEventListener('click', function() { if (curBook && curBook['File ID']) pvLoad(String(curBook['File ID'])); });
+
+function pvRender(num) {
+  if (PV.pages[num]) return Promise.resolve(PV.pages[num]);
+  if (PV.pending[num]) return PV.pending[num];
+  var tk = PV.token, pdf = PV.pdf;
+  var p = pdf.getPage(num).then(function(page) {
+    var vp1 = page.getViewport({ scale: 1 });
+    var stageW = byId('pgStage').clientWidth || 600;
+    var targetW = Math.round(clamp(stageW * (window.devicePixelRatio || 1) * 1.6, 1400, 2200));
+    var vp = page.getViewport({ scale: targetW / vp1.width });
+    var c = document.createElement('canvas'); c.width = Math.floor(vp.width); c.height = Math.floor(vp.height);
+    var ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+    return page.render({ canvasContext: ctx, viewport: vp }).promise.then(function() {
+      return new Promise(function(res) { if (c.toBlob) c.toBlob(res, 'image/jpeg', 0.9); else res(null); });
+    }).then(function(blob) {
+      var info = { url: blob ? URL.createObjectURL(blob) : c.toDataURL('image/jpeg', 0.9), w: c.width, h: c.height };
+      try { page.cleanup(); } catch (e) {}
+      if (tk !== PV.token) { if (blob) URL.revokeObjectURL(info.url); throw new Error('stale'); }
+      PV.pages[num] = info; delete PV.pending[num];
+      return info;
+    });
+  });
+  p.catch(function() { if (tk === PV.token) delete PV.pending[num]; });
+  PV.pending[num] = p;
+  return p;
+}
+
+function pvEvict(cur) {
+  Object.keys(PV.pages).forEach(function(k) {
+    if (Math.abs(+k - cur) > 3) { var u = PV.pages[k].url; if (u.indexOf('blob:') === 0) URL.revokeObjectURL(u); delete PV.pages[k]; }
+  });
+}
+
+function pvUpdateNav() {
+  byId('pgCounter').textContent = 'หน้า ' + PV.cur + ' จาก ' + PV.n;
+  byId('pgPrev').disabled = PV.cur <= 1;
+  byId('pgNext').disabled = PV.cur >= PV.n;
+  if (zoomOpen) { byId('zvPage').textContent = 'หน้า ' + PV.cur + ' / ' + PV.n; byId('zvPrev').disabled = PV.cur <= 1; byId('zvNext').disabled = PV.cur >= PV.n; }
+}
+
+function pvShow(num, dir) {
+  if (!PV.pdf) return;
+  num = clamp(num, 1, PV.n);
+  PV.cur = num; pvUpdateNav();
+  var tk = PV.token, first = byId('pgStage').classList.contains('empty');
+  if (!PV.pages[num]) {
+    if (first) pvMsg('กำลังเปิดหน้า ' + num + ' ...', true, false);
+    else { clearTimeout(pgLoadTimer); pgLoadTimer = setTimeout(function() { pvMsg('กำลังเปิดหน้า ' + num + ' ...', true, false); }, 180); }
+    if (zoomOpen) byId('zvSpin').hidden = false;
+  }
+  pvRender(num).then(function(info) {
+    if (tk !== PV.token || PV.cur !== num) return;
+    var img = byId('pgImg');
+    img.classList.remove('anim-next', 'anim-prev'); void img.offsetWidth;
+    img.width = info.w; img.height = info.h;
+    img.src = info.url; img.alt = 'หน้า ' + num;
+    byId('pgStage').classList.remove('empty');
+    if (dir) img.classList.add(dir === 'next' ? 'anim-next' : 'anim-prev');
+    pvHideMsg();
+    if (zoomOpen) zvRefresh(true);
+    if (num < PV.n) pvRender(num + 1).catch(noop);
+    pvEvict(num);
+  }).catch(function(err) {
+    if (err && err.message === 'stale') return;
+    if (tk !== PV.token) return;
+    pvMsg('เปิดหน้านี้ไม่สำเร็จ', false, false);
+  });
+}
+
+function pvGo(d) {
+  if (!PV.pdf) return;
+  var n = PV.cur + d;
+  if (n < 1 || n > PV.n) return;
+  pvShow(n, d > 0 ? 'next' : 'prev');
+}
+
+// ปัดซ้าย/ขวา = เปลี่ยนหน้า, แตะ = ขยายเต็มจอ
+(function() {
+  var stage = byId('pgStage'), sx = 0, sy = 0, swiped = false;
+  stage.addEventListener('touchstart', function(e) { if (e.touches.length !== 1) return; sx = e.touches[0].clientX; sy = e.touches[0].clientY; swiped = false; }, { passive: true });
+  stage.addEventListener('touchend', function(e) {
+    var t = e.changedTouches[0]; if (!t) return;
+    var dx = t.clientX - sx, dy = t.clientY - sy;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.3) { swiped = true; pvGo(dx < 0 ? 1 : -1); }
+  }, { passive: true });
+  stage.addEventListener('click', function() { if (swiped) { swiped = false; return; } if (PV.pdf && PV.pages[PV.cur]) openZoom(); });
+})();
+
+// ════════════════════════════════════════
+// 🔍 ขยายเต็มจอ (ปุ่ม + ถ่างสองนิ้ว)
+// ════════════════════════════════════════
+var ZV = { zoom: 1, baseW: 0, ratio: 1.414 };
+var ZV_MIN = 1, ZV_MAX = 4;
+var zoomOpen = false;
+
+function openZoom() {
+  if (!PV.pdf || !PV.pages[PV.cur] || zoomOpen) return;
+  try { history.pushState({ pt: 'zoom' }, '', '#b=' + encodeURIComponent(bookId(curBook)) + '&z=1'); } catch (e) {}
+  zoomOpen = true;
+  byId('zoomView').hidden = false;
+  document.body.style.overflow = 'hidden';
+  ZV.zoom = 1;
+  pvUpdateNav();
+  zvRefresh(true);
+}
+function closeZoom() {
+  if (history.state && history.state.pt === 'zoom') { history.back(); return; }
+  closeZoomUI();
+}
+function closeZoomUI() {
+  zoomOpen = false;
+  byId('zoomView').hidden = true;
+  document.body.style.overflow = '';
+}
+function zvCalcBase() {
+  var s = byId('zvScroll'), sw = s.clientWidth - 16, sh = s.clientHeight - 16;
+  ZV.baseW = window.innerWidth < 768 ? sw : Math.min(sw, sh / (ZV.ratio || 1.414));
+  if (ZV.baseW < 120) ZV.baseW = 120;
+}
+function zvApply() {
+  var w = ZV.baseW * ZV.zoom, img = byId('zvImg');
+  img.style.width = w + 'px'; img.style.height = (w * (ZV.ratio || 1.414)) + 'px';
+  byId('zvPct').textContent = Math.round(ZV.zoom * 100) + '%';
+  byId('zvOut').disabled = ZV.zoom <= ZV_MIN + 0.001;
+  byId('zvIn').disabled = ZV.zoom >= ZV_MAX - 0.001;
+}
+function zvRefresh(resetScroll) {
+  var info = PV.pages[PV.cur]; if (!info) return;
+  var img = byId('zvImg');
+  if (img.getAttribute('src') !== info.url) img.src = info.url;
+  img.alt = 'หน้า ' + PV.cur;
+  ZV.ratio = info.h / info.w;
+  zvCalcBase(); zvApply();
+  if (resetScroll) { var s = byId('zvScroll'); s.scrollTop = 0; s.scrollLeft = 0; }
+}
+function zvSetZoom(z, cx, cy) {
+  var s = byId('zvScroll');
+  if (cx == null) cx = s.clientWidth / 2;
+  if (cy == null) cy = s.clientHeight / 2;
+  var bx = s.scrollLeft + cx, by = s.scrollTop + cy, old = ZV.zoom;
+  ZV.zoom = clamp(z, ZV_MIN, ZV_MAX);
+  zvApply();
+  var r = ZV.zoom / old;
+  s.scrollLeft = bx * r - cx; s.scrollTop = by * r - cy;
+}
+(function() {
+  var s = byId('zvScroll'), d0 = 0, z0 = 1, c = { x: 0, y: 0 }, sx = 0, sy = 0, one = false;
+  s.addEventListener('touchstart', function(e) {
+    if (e.touches.length === 2) {
+      one = false;
+      var a = e.touches[0], b = e.touches[1];
+      d0 = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY); z0 = ZV.zoom;
+      var rc = s.getBoundingClientRect();
+      c.x = (a.clientX + b.clientX) / 2 - rc.left; c.y = (a.clientY + b.clientY) / 2 - rc.top;
+    } else if (e.touches.length === 1) { one = true; sx = e.touches[0].clientX; sy = e.touches[0].clientY; }
+  }, { passive: true });
+  s.addEventListener('touchmove', function(e) {
+    if (e.touches.length === 2 && d0 > 0) {
+      if (e.cancelable) e.preventDefault();
+      var a = e.touches[0], b = e.touches[1];
+      zvSetZoom(z0 * Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY) / d0, c.x, c.y);
+    }
+  }, { passive: false });
+  s.addEventListener('touchend', function(e) {
+    if (e.touches.length < 2) d0 = 0;
+    if (one && e.touches.length === 0 && ZV.zoom <= ZV_MIN + 0.05) {   // ขนาดพอดีจอ: ปัดเพื่อเปลี่ยนหน้า
+      var t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.3) pvGo(dx < 0 ? 1 : -1);
+    }
+    if (e.touches.length === 0) one = false;
+  }, { passive: true });
+})();
+
+// ════════════════════════════════════════
+// 🔊 เล่นไฟล์เสียง
+// ════════════════════════════════════════
+var AU = { state: 'idle', fileId: '', mime: '', url: '', want: false, tk: 0 };
+var AU_CACHE = [];
+var auEl = byId('auEl');
+
+function fmtTime(t) { t = Math.max(0, Math.floor(t || 0)); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+
+function auSetState(s, text, sub) {
+  AU.state = s;
+  var btn = byId('auBtn'), icon = byId('auIcon');
+  btn.classList.remove('playing', 'loading', 'error');
+  var cfg = {
+    loading: ['fas fa-spinner fa-spin', 'กำลังเตรียมเสียง...', 'กรุณารอสักครู่', 'loading'],
+    ready:   ['fas fa-volume-high', 'กดเพื่อฟังคำอธิบาย', 'แตะที่ปุ่มนี้ 1 ครั้ง', ''],
+    playing: ['fas fa-volume-high', 'กำลังเล่นเสียง', 'กดอีกครั้งเพื่อหยุดชั่วคราว', 'playing'],
+    paused:  ['fas fa-play', 'หยุดไว้ชั่วคราว', 'กดเพื่อฟังต่อ', ''],
+    ended:   ['fas fa-rotate-right', 'ฟังจบแล้ว', 'กดเพื่อฟังอีกครั้ง', ''],
+    error:   ['fas fa-triangle-exclamation', 'เปิดเสียงไม่สำเร็จ', 'กดเพื่อลองใหม่', 'error']
+  }[s] || ['fas fa-volume-high', 'กดเพื่อฟังคำอธิบาย', '', ''];
+  icon.className = cfg[0];
+  byId('auText').textContent = text || cfg[1];
+  byId('auSub').textContent = sub != null ? sub : cfg[2];
+  if (cfg[3]) btn.classList.add(cfg[3]);
+  var ready = (s !== 'loading' && s !== 'error');
+  byId('auTools').hidden = !ready; byId('auProg').hidden = !ready;
+}
+
+function auSetup(book) {
+  auReset();
+  AU.fileId = String(book['Audio File ID'] || '');
+  AU.mime = String(book['Audio Mime'] || '') || 'audio/mpeg';
+  auLoad();
+}
+
+function auLoad() {
+  var tk = ++AU.tk, id = AU.fileId;
+  auSetState('loading');
+  var hit = AU_CACHE.filter(function(e) { return e.id === id; })[0];
+  var getUrl = hit ? Promise.resolve(hit.url) : callBackend('getPdfData', { fileId: id }).then(function(res) {
+    var url = URL.createObjectURL(new Blob([b64ToBytes(res.data)], { type: AU.mime }));
+    AU_CACHE.unshift({ id: id, url: url });
+    if (AU_CACHE.length > 3) URL.revokeObjectURL(AU_CACHE.pop().url);
+    return url;
+  });
+  getUrl.then(function(url) {
+    if (tk !== AU.tk) return;
+    AU.url = url; auEl.src = url; auEl.load();
+    auSetState('ready');
+    if (AU.want) { AU.want = false; auPlay(); }
+  }).catch(function() { if (tk === AU.tk) auSetState('error'); });
+}
+
+function auPlay() {
+  var p = auEl.play();
+  if (p && p.catch) p.catch(function(err) {
+    if (err && err.name === 'AbortError') return;   // ถูกกดหยุดระหว่างเริ่มเล่น
+    auSetState('ready', 'พร้อมแล้ว', 'กดที่ปุ่มนี้อีกครั้งเพื่อฟัง');
+  });
+}
+
+function auBtnClick() {
+  switch (AU.state) {
+    case 'playing': auEl.pause(); break;
+    case 'loading': AU.want = true; auSetState('loading', 'กำลังเตรียมเสียง...', 'จะเริ่มเล่นให้เองเมื่อพร้อม'); break;
+    case 'error': AU.want = true; auLoad(); break;
+    case 'ended': auEl.currentTime = 0; auPlay(); break;
+    case 'idle': break;
+    default: auPlay();
+  }
+}
+function auSeek(sec) {
+  if (!AU.url) return;
+  var t = (auEl.currentTime || 0) + sec, d = auEl.duration;
+  auEl.currentTime = clamp(t, 0, isFinite(d) ? d : Math.max(t, 0));
+}
+function auRestart() { if (!AU.url) return; auEl.currentTime = 0; auPlay(); }
+
+function auReset() {
+  AU.tk++; AU.want = false;
+  try { auEl.pause(); } catch (e) {}
+  auEl.removeAttribute('src'); try { auEl.load(); } catch (e) {}
+  AU.url = ''; AU.fileId = '';
+  byId('auBar').style.width = '0%'; byId('auTime').textContent = '0:00 / 0:00';
+  AU.state = 'idle';
+}
+
+auEl.addEventListener('play', function() { if (AU.url) auSetState('playing'); });
+auEl.addEventListener('pause', function() { if (AU.url && !auEl.ended && AU.state === 'playing') auSetState('paused'); });
+auEl.addEventListener('ended', function() { if (AU.url) auSetState('ended'); });
+auEl.addEventListener('timeupdate', function() {
+  var d = auEl.duration || 0, t = auEl.currentTime || 0;
+  byId('auBar').style.width = (d ? (t / d * 100) : 0) + '%';
+  byId('auTime').textContent = fmtTime(t) + ' / ' + fmtTime(d);
+});
+auEl.addEventListener('loadedmetadata', function() { byId('auTime').textContent = fmtTime(auEl.currentTime) + ' / ' + fmtTime(auEl.duration); });
+auEl.addEventListener('error', function() { if (AU.url && AU.state !== 'idle') auSetState('error'); });
+
+// ════════════════════════════════════════
+// 🔐 โหมดเจ้าหน้าที่ (ตรวจรหัสผ่านที่ Apps Script)
+// ════════════════════════════════════════
+function toast(icon, title) { Swal.fire({ toast: true, position: 'top', showConfirmButton: false, timer: 1800, icon: icon, title: title }); }
+
+function onAdminIcon() { requireAdmin(function() { openForm(); }); }
+
+function requireAdmin(cb) {
+  if (ADMIN_PIN) { cb(); return; }
+  askPin().then(function(ok) { if (ok) cb(); });
+}
+
+function askPin() {
+  return Swal.fire({
+    title: 'สำหรับเจ้าหน้าที่',
+    text: 'กรุณาใส่รหัสผ่านเพื่อเพิ่ม แก้ไข หรือลบหนังสือ',
+    input: 'password', inputPlaceholder: 'รหัสผ่าน',
+    inputAttributes: { inputmode: 'numeric', autocomplete: 'off', maxlength: '12' },
+    showCancelButton: true, confirmButtonText: 'ยืนยัน', cancelButtonText: 'ยกเลิก', confirmButtonColor: '#1d4ed8',
+    showLoaderOnConfirm: true,
+    allowOutsideClick: function() { return !Swal.isLoading(); },
+    preConfirm: function(pin) {
+      pin = String(pin || '').trim();
+      if (!pin) { Swal.showValidationMessage('กรุณาใส่รหัสผ่าน'); return false; }
+      return callBackend('ptVerifyPin', { pin: pin }).then(function() { return pin; })
+        .catch(function(err) { Swal.showValidationMessage(err.message || 'รหัสผ่านไม่ถูกต้อง'); return false; });
+    }
+  }).then(function(r) {
+    if (r.isConfirmed && r.value) { ADMIN_PIN = r.value; setAdmin(true); return true; }
+    return false;
+  });
+}
+
+function setAdmin(on) {
+  document.body.classList.toggle('is-admin', on);
+  byId('adminBar').hidden = !on;
+  if (!on) ADMIN_PIN = '';
+}
+function lockAdmin() { setAdmin(false); toast('success', 'ออกจากโหมดเจ้าหน้าที่แล้ว'); }
+function isPinError(err) { return /รหัสผ่านไม่ถูกต้อง|ใส่รหัสผิด/.test(String(err && err.message)); }
+
+function shareBook(idx) {
+  var book = bookData[idx]; if (!book) return;
+  var link = location.href.split('#')[0] + '#b=' + encodeURIComponent(bookId(book));
+  window.open('https://line.me/R/msg/text/?' + encodeURIComponent('📚 ' + book['Book Title'] + '\n\n' + link), '_blank');
+}
+
+function confirmDelete(idx) {
+  requireAdmin(function() {
+    var book = bookData[idx]; if (!book) return;
+    Swal.fire({
+      title: 'ยืนยันการลบ?', icon: 'warning',
+      html: 'เรื่อง <b>' + escHtml(book['Book Title']) + '</b><br><span style="font-size:14px;color:#64748b">ไฟล์ PDF ภาพตัวอย่าง และไฟล์เสียงของเรื่องนี้จะย้ายไปถังขยะใน Google Drive</span>',
+      showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'ลบเลย', cancelButtonText: 'ยกเลิก'
+    }).then(function(r) {
+      if (!r.isConfirmed) return;
+      Swal.fire({ title: 'กำลังลบ...', allowOutsideClick: false, didOpen: function() { Swal.showLoading(); } });
+      callBackend('ptDeleteBook', { pin: ADMIN_PIN, id: book['ID'] !== '' && book['ID'] != null ? String(book['ID']) : '', rowIndex: book.rowIndex })
+        .then(function() { Swal.fire({ icon: 'success', title: 'ลบเรียบร้อย', timer: 1200, showConfirmButton: false }); loadBooks(); })
+        .catch(function(err) { if (isPinError(err)) setAdmin(false); Swal.fire({ icon: 'error', title: 'ลบไม่สำเร็จ', text: err.message }); });
+    });
+  });
+}
+
+// ════════════════════════════════════════
+// 📝 ฟอร์มเพิ่ม / แก้ไข
+// ════════════════════════════════════════
+var formState = { idx: -1, existingFileId: '', existingAudioId: '', audioFile: null };
+var formPreview = { data: '', changed: false, custom: false };
+
+// สถานะไฟล์เสียงในฟอร์ม: มีไฟล์ใหม่ / มีไฟล์เดิม / ถูกสั่งลบ / ไม่มี
+function renderAudioField() {
+  var f = formState.audioFile, el = byId('auFileName');
+  var music = '<i class="fas fa-music" style="color:#ea580c"></i> ';
+  if (f) el.innerHTML = music + escHtml(f.name) + ' (' + fmtMB(f.size) + ')';
+  else if (formState.existingAudioId && !formState.removeAudio) el.innerHTML = music + 'มีไฟล์เสียงเดิมแล้ว — เลือกไฟล์ใหม่เพื่อเปลี่ยน';
+  else if (formState.existingAudioId && formState.removeAudio) el.innerHTML = '<span style="color:#dc2626"><i class="fas fa-trash"></i> จะลบไฟล์เสียงเดิมเมื่อกดบันทึก</span>';
+  else el.textContent = 'ยังไม่มีไฟล์เสียง';
+  var hasAny = !!f || (!!formState.existingAudioId && !formState.removeAudio);
+  byId('auRemoveBtn').hidden = !hasAny;
+  byId('auPickLabel').textContent = hasAny ? 'เปลี่ยนไฟล์เสียง' : 'เลือกไฟล์เสียง';
+}
+function removeAudio() {
+  formState.audioFile = null;
+  formState.removeAudio = !!formState.existingAudioId;
+  renderAudioField();
+}
+
+function updateYtPreview() {
+  var raw = byId('ytUrl').value.trim(), id = ytId(raw);
+  byId('ytPrev').hidden = !id;
+  byId('ytBad').hidden = !raw || !!id;
+  if (id) byId('ytThumb').src = 'https://img.youtube.com/vi/' + id + '/mqdefault.jpg';
+}
+byId('ytUrl').addEventListener('input', updateYtPreview);
+
+function fmtMB(bytes) { return (bytes / 1048576).toFixed(1) + ' MB'; }
+function audioMimeOf(f) {
+  var t = String(f.type || '').toLowerCase();
+  if (t === 'audio/x-m4a' || t === 'audio/m4a') return 'audio/mp4';
+  if (t === 'audio/mp3') return 'audio/mpeg';
+  if (t) return t;
+  var ext = (String(f.name).split('.').pop() || '').toLowerCase();
+  return { mp3: 'audio/mpeg', m4a: 'audio/mp4', aac: 'audio/aac', wav: 'audio/wav', ogg: 'audio/ogg', oga: 'audio/ogg', webm: 'audio/webm' }[ext] || 'audio/mpeg';
+}
+byId('audioFile').addEventListener('change', function() {
+  var f = this.files[0]; if (!f) return;
+  if (f.size > MAX_AUDIO_MB * 1048576) {
+    Swal.fire({ icon: 'warning', title: 'ไฟล์เสียงใหญ่เกินไป', text: 'ไฟล์นี้ ' + fmtMB(f.size) + ' กรุณาใช้ไฟล์ไม่เกิน ' + MAX_AUDIO_MB + ' MB' });
+    this.value = ''; return;
+  }
+  formState.audioFile = f;
+  formState.removeAudio = false;
+  renderAudioField();
+  this.value = '';
+});
+
+function openForm(idx) {
+  hidePreview();
+  var isEdit = typeof idx === 'number' && idx >= 0 && bookData[idx];
+  var book = isEdit ? bookData[idx] : null;
+  byId('bookForm').reset();
+  formState = { idx: isEdit ? idx : -1, existingFileId: book ? String(book['File ID'] || '') : '', existingAudioId: book ? String(book['Audio File ID'] || '') : '', audioFile: null, removeAudio: false };
+  formPreview = { data: book ? getPreviewOf(book) : '', changed: false, custom: false };
+  byId('modalTitle').textContent = isEdit ? 'แก้ไขหนังสือ' : 'เพิ่มหนังสือใหม่';
+  byId('bookTitle').value = book ? String(book['Book Title'] || '') : '';
+  byId('bookDesc').value = book ? String(book['Description'] || '') : '';
+  byId('fileName').textContent = formState.existingFileId ? '(มีไฟล์เดิม — เลือกใหม่เพื่อเปลี่ยน)' : 'คลิกหรือลากไฟล์ PDF มาวางที่นี่';
+  byId('pvPage').value = 1;
+  setPvStatus(!book ? 'เลือกไฟล์ PDF แล้วระบบจะสร้างภาพจากหน้าแรกให้อัตโนมัติ'
+    : (formPreview.data ? 'มีภาพตัวอย่างอยู่แล้ว — เปลี่ยนได้โดยอัปโหลดรูป หรือระบุหน้าแล้วกด "ดึงภาพ"' : 'ยังไม่มีภาพตัวอย่าง — ระบุหน้าแล้วกด "ดึงภาพ" หรืออัปโหลดรูปเอง'), '');
+  renderFormPreview();
+  byId('ytUrl').value = book && hasVideo(book) ? String(book['Video URL'] || '') : '';
+  updateYtPreview();
+  renderAudioField();
+  byId('formModal').hidden = false;
+  document.body.style.overflow = 'hidden';
+  setTimeout(function() { try { byId('bookTitle').focus(); } catch (e) {} }, 60);
+}
+function closeForm() { byId('formModal').hidden = true; document.body.style.overflow = ''; }
+byId('formModal').addEventListener('click', function(e) { if (e.target === this) closeForm(); });
+
+function onPdfPicked(f) {
+  if (!f) return;
+  if (f.type && f.type !== 'application/pdf') { Swal.fire({ icon: 'warning', title: 'กรุณาเลือกไฟล์ PDF' }); return; }
+  if (f.size > MAX_PDF_MB * 1048576) { Swal.fire({ icon: 'warning', title: 'ไฟล์ PDF ใหญ่เกินไป', text: 'ไฟล์นี้ ' + fmtMB(f.size) + ' กรุณาใช้ไฟล์ไม่เกิน ' + MAX_PDF_MB + ' MB' }); byId('bookFile').value = ''; return; }
+  byId('fileName').textContent = f.name + ' (' + fmtMB(f.size) + ')';
+  if (!formPreview.custom) { byId('pvPage').value = 1; genPreviewFromPdf(true); }
+}
+byId('dropZone').addEventListener('click', function(e) { if (e.target === byId('bookFile')) return; byId('bookFile').click(); });
+byId('bookFile').addEventListener('change', function() { onPdfPicked(this.files[0]); });
+['dragenter', 'dragover'].forEach(function(ev) { byId('dropZone').addEventListener(ev, function(e) { e.preventDefault(); this.classList.add('dragover'); }); });
+['dragleave', 'drop'].forEach(function(ev) { byId('dropZone').addEventListener(ev, function(e) { e.preventDefault(); this.classList.remove('dragover'); }); });
+byId('dropZone').addEventListener('drop', function(e) {
+  var f = e.dataTransfer && e.dataTransfer.files[0]; if (!f) return;
+  try { var dt = new DataTransfer(); dt.items.add(f); byId('bookFile').files = dt.files; } catch (err) {}
+  onPdfPicked(f);
+});
+
+// ── ภาพตัวอย่าง One Page ──
+function compressToJpeg(source, srcW, srcH) {
+  var widths = [1100, 900, 720, 560], quals = [0.9, 0.8, 0.7], last = '';
+  for (var wi = 0; wi < widths.length; wi++) {
+    var w = Math.min(widths[wi], srcW), h = Math.round(w * srcH / srcW);
+    var c = document.createElement('canvas'); c.width = w; c.height = h;
+    var ctx = c.getContext('2d'); ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
+    ctx.imageSmoothingQuality = 'high'; ctx.drawImage(source, 0, 0, w, h);
+    for (var qi = 0; qi < quals.length; qi++) { last = c.toDataURL('image/jpeg', quals[qi]); if (last.length <= PREVIEW_MAX_CHARS) return last; }
+  }
+  return last;
+}
+async function pdfBytesToPreview(bytes, pageNum) {
+  var pdf = await pdfjsLib.getDocument({ data: bytes.slice() }).promise;
+  var n = Math.min(Math.max(1, parseInt(pageNum) || 1), pdf.numPages);
+  var page = await pdf.getPage(n);
+  var vp1 = page.getViewport({ scale: 1 }), vp = page.getViewport({ scale: 1500 / vp1.width });
+  var c = document.createElement('canvas'); c.width = vp.width; c.height = vp.height;
+  var ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+  await page.render({ canvasContext: ctx, viewport: vp }).promise;
+  var out = { url: compressToJpeg(c, c.width, c.height), page: n, total: pdf.numPages };
+  try { pdf.destroy(); } catch (e) {}
+  return out;
+}
+function setPvStatus(msg, color) { var el = byId('pvStatus'); el.textContent = msg; el.style.color = color || ''; }
+function renderFormPreview() {
+  var img = byId('pvFormImg'), empty = byId('pvFormEmpty');
+  if (formPreview.data) { img.src = formPreview.data; img.hidden = false; empty.hidden = true; }
+  else { img.removeAttribute('src'); img.hidden = true; empty.hidden = false; }
+  byId('pvClearBtn').hidden = !formPreview.data;
+}
+function clearPreview() { formPreview = { data: '', changed: true, custom: false }; renderFormPreview(); setPvStatus('ลบภาพตัวอย่างแล้ว (กดบันทึกเพื่อยืนยัน)', '#ef4444'); }
+
+async function genPreviewFromPdf(silentFirstPage) {
+  var page = silentFirstPage === true ? 1 : (parseInt(byId('pvPage').value) || 1);
+  var file = byId('bookFile').files[0], existingId = formState.existingFileId;
+  if (!file && !existingId) { setPvStatus('กรุณาเลือกไฟล์ PDF ก่อน', '#ef4444'); return; }
+  byId('pvGenBtn').disabled = true;
+  setPvStatus('กำลังสร้างภาพตัวอย่างหน้า ' + page + ' ...', '#2563eb');
+  try {
+    var bytes;
+    if (file) bytes = new Uint8Array(await file.arrayBuffer());
+    else {
+      bytes = cacheGet(existingId);
+      if (!bytes) { var res = await callBackend('getPdfData', { fileId: existingId }); bytes = b64ToBytes(res.data); cachePut(existingId, bytes); }
+    }
+    var out = await pdfBytesToPreview(bytes, page);
+    formPreview = { data: out.url, changed: true, custom: false };
+    byId('pvPage').value = out.page; byId('pvPage').max = out.total;
+    renderFormPreview();
+    setPvStatus('ได้ภาพจากหน้า ' + out.page + ' / ' + out.total + ' แล้ว', '#059669');
+  } catch (err) { setPvStatus('สร้างภาพไม่สำเร็จ: ' + err.message, '#ef4444'); }
+  byId('pvGenBtn').disabled = false;
+}
+
+byId('previewFile').addEventListener('change', function() {
+  var f = this.files[0]; if (!f) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    var im = new Image();
+    im.onload = function() { formPreview = { data: compressToJpeg(im, im.naturalWidth, im.naturalHeight), changed: true, custom: true }; renderFormPreview(); setPvStatus('ใช้รูปที่อัปโหลดแล้ว', '#059669'); };
+    im.onerror = function() { setPvStatus('อ่านไฟล์รูปไม่ได้', '#ef4444'); };
+    im.src = ev.target.result;
+  };
+  reader.readAsDataURL(f);
+  this.value = '';
+});
+
+function readAsDataURL(f) {
+  return new Promise(function(res, rej) { var r = new FileReader(); r.onload = function() { res(r.result); }; r.onerror = function() { rej(new Error('อ่านไฟล์ไม่ได้')); }; r.readAsDataURL(f); });
+}
+
+async function handleSave(e) {
+  e.preventDefault();
+  var book = formState.idx >= 0 ? bookData[formState.idx] : null;
+  var title = byId('bookTitle').value.trim();
+  if (!title) { Swal.fire({ icon: 'warning', title: 'กรุณาใส่ชื่อเรื่อง' }); return; }
+  var pdfFile = byId('bookFile').files[0];
+  var info = { pin: ADMIN_PIN, bookTitle: title, description: byId('bookDesc').value.trim() };
+  if (book) { info.id = (book['ID'] !== '' && book['ID'] != null) ? String(book['ID']) : ''; info.rowIndex = book.rowIndex; }
+
+  // วิดีโอ (ไม่บังคับ): ช่องว่าง = ไม่มีวิดีโอ
+  var ytRaw = byId('ytUrl').value.trim(), vid = ytId(ytRaw);
+  if (ytRaw && !vid) { Swal.fire({ icon: 'warning', title: 'ลิงก์ YouTube ไม่ถูกต้อง', text: 'กรุณาวางลิงก์จากปุ่ม "แชร์" ของ YouTube หรือลบข้อความในช่องออกถ้าไม่ต้องการแนบวิดีโอ' }); return; }
+  info.videoUrl = vid ? 'https://youtu.be/' + vid : '';
+  // เสียง (ไม่บังคับ)
+  if (!formState.audioFile && formState.removeAudio) info.removeAudio = true;
+  if (formPreview.changed) info.previewImage = formPreview.data || '';
+  var totalBytes = (pdfFile ? pdfFile.size : 0) + (formState.audioFile ? formState.audioFile.size : 0);
+  if (totalBytes > MAX_TOTAL_MB * 1048576) {
+    Swal.fire({ icon: 'warning', title: 'ไฟล์รวมกันใหญ่เกินไป', text: 'PDF และไฟล์เสียงรวมกัน ' + fmtMB(totalBytes) + ' — กรุณาบันทึกไม่เกิน ' + MAX_TOTAL_MB + ' MB ต่อครั้ง (บันทึก PDF ก่อน แล้วกดแก้ไขเพื่อเพิ่มไฟล์เสียงภายหลังได้)' });
+    return;
+  }
+
+  Swal.fire({ title: 'กำลังนำหนังสือขึ้นชั้น...', text: (pdfFile || formState.audioFile) ? 'กำลังอัปโหลดไฟล์ อาจใช้เวลาสักครู่' : '', allowOutsideClick: false, didOpen: function() { Swal.showLoading(); } });
+  try {
+    if (pdfFile) info.fileBase64 = await readAsDataURL(pdfFile);
+    if (formState.audioFile) {
+      info.audioBase64 = await readAsDataURL(formState.audioFile);
+      info.audioName = formState.audioFile.name;
+      info.audioMime = audioMimeOf(formState.audioFile);
+    }
+    await callBackend('ptSaveBook', info);
+    Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ!', timer: 1500, showConfirmButton: false });
+    closeForm(); loadBooks();
+  } catch (err) {
+    if (isPinError(err)) setAdmin(false);
+    Swal.fire({ icon: 'error', title: 'บันทึกไม่สำเร็จ', text: err.message });
+  }
+}
+
+// ════════════════════════════════════════
+// เริ่มต้น
+// ════════════════════════════════════════
+document.addEventListener('keydown', function(e) {
+  var tag = (e.target && e.target.tagName) || '';
+  if (/INPUT|TEXTAREA|SELECT/.test(tag) || !byId('formModal').hidden || Swal.isVisible()) return;
+  if (zoomOpen) {
+    if (e.key === 'Escape') closeZoom();
+    else if (e.key === 'ArrowRight') pvGo(1);
+    else if (e.key === 'ArrowLeft') pvGo(-1);
+    else if (e.key === '+' || e.key === '=') zvSetZoom(ZV.zoom + 0.5);
+    else if (e.key === '-') zvSetZoom(ZV.zoom - 0.5);
+  } else if (curBook) {
+    if (e.key === 'ArrowRight' && PV.pdf) pvGo(1);
+    else if (e.key === 'ArrowLeft' && PV.pdf) pvGo(-1);
+  }
+});
+
+var rzTimer = null;
+window.addEventListener('resize', function() {
+  hidePreview();
+  clearTimeout(rzTimer);
+  rzTimer = setTimeout(function() {
+    if (bookData.length && shelfCols() !== shelfColsNow) renderBooks();
+    if (zoomOpen) { zvCalcBase(); zvApply(); }
+  }, 150);
+});
+window.addEventListener('scroll', function() { clearTimeout(pvTimer); hidePreview(); }, { passive: true });
+
+applyFs();
+loadBooks();
+</script>
+</body>
+</html>
